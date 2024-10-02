@@ -302,7 +302,7 @@ class SVGRect:
         pngsliceFName = f"{slicename}.png"
 
         for i, size in enumerate(SIZES):
-            subdir = f"bitmaps/{size}x{size}"
+            subdir = f"pngs/{size}x{size}"
 
             if not os.path.exists(subdir):
                 os.makedirs(subdir)
@@ -311,7 +311,7 @@ class SVGRect:
             do_res(size, relslice, svgFName)
 
             for scale in SCALE_PAIRS:
-                subdir = f"bitmaps/{size}x{size}_{scale[1]}"
+                subdir = f"pngs/{size}x{size}_{scale[1]}"
                 relslice = f"{subdir}/{pngsliceFName}"
 
                 if not os.path.exists(subdir):
@@ -348,12 +348,12 @@ def postprocess_slice(slicename, skipped):
     pngsliceFName = f"{slicename}.png"
 
     for i, size in enumerate(SIZES):
-        subdir = f"bitmaps/{size}x{size}"
+        subdir = f"pngs/{size}x{size}"
         relslice = f"{subdir}/{pngsliceFName}"
         csize = get_csize(i, size)
 
         for scale in SCALE_PAIRS:
-            subdir = f"bitmaps/{size}x{size}_{scale[1]}"
+            subdir = f"pngs/{size}x{size}_{scale[1]}"
             relslice = f"{subdir}/{pngsliceFName}"
 
 
@@ -385,13 +385,13 @@ def write_xcur(slicename):
             fps_field = " {}".format(int(1000.0 / options.fps))
 
     xcur = {}
-    xcur["s0"] = open(f"bitmaps/{slicename}.in", mode)
+    xcur["s0"] = open(f"pngs/{slicename}.in", mode)
     if len(SCALE_PAIRS) > 0:
-        xcur["s1"] = open(f"bitmaps/{slicename}.s1.in", mode)
-        xcur["s2"] = open(f"bitmaps/{slicename}.s2.in", mode)
+        xcur["s1"] = open(f"pngs/{slicename}.s1.in", mode)
+        xcur["s2"] = open(f"pngs/{slicename}.s2.in", mode)
 
     for i, size in enumerate(SIZES):
-        subdir = f"bitmaps/{size}x{size}"
+        subdir = f"pngs/{size}x{size}"
         relslice = f"{subdir}/{pngsliceFName}"
         filename = f"{size}x{size}/{pngsliceFName}"
         hotrelslice = f"{subdir}/{hotsliceFName}"
@@ -401,7 +401,7 @@ def write_xcur(slicename):
         xcur["s0"].write(f"{csize} {hot[0]} {hot[1]} {filename}{fps_field}\n")
 
         for scale in SCALE_PAIRS:
-            subdir = f"bitmaps/{size}x{size}_{scale[1]}"
+            subdir = f"pngs/{size}x{size}_{scale[1]}"
             relslice = f"{subdir}/{pngsliceFName}"
             filename = f"{size}x{size}/{scale[1]}"
             scaled_size = int(size * scale[0])
@@ -438,10 +438,10 @@ def sort_xcur(slicename, passed):
         return
     passed[slicename] = True
 
-    sort_file("bitmaps/{slicename}.in")
+    sort_file("pngs/{slicename}.in")
     if len(SCALE_PAIRS) > 0:
-        sort_file(f"bitmaps/{slicename}.s1.in")
-        sort_file(f"bitmaps/{slicename}.s2.in")
+        sort_file(f"pngs/{slicename}.s1.in")
+        sort_file(f"pngs/{slicename}.s2.in")
 
 
 class SVGHandler(handler.ContentHandler):
