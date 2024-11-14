@@ -32,12 +32,21 @@ Gtk doesn't care about the colors you define for the icon. They are recolored at
 
 ### Cursor generation
 
-Cursors are in the xcursorgen format. They come in multiple sizes and possibly animation frames per file. Generating them is a two sstep process. 
+1. Install inkscape from flathub: (using inkscape packaged from your linux distribution will not work)
 
-First step is to render the source svg into multiple pngs. This is done with the `renderpngs.py` script. It takes the adwaita.svg file and generates the pngs for the different sizes and saves them in the `pngs/` directory.
+        flatpak install flathub org.inkscape.Inkscape
 
-The cursors are then generated using the `cursorgen.py` script. The `cursors.py` file contains a dictionary that maps the cursor name to the *cursor info* files such as `pngs/default.in`. The *cursor info* is a dictionary that contains the hotspot, frames, and duration. If the cursor is animated, the duration is the milliseconds each frame takes.
+1. Install script dependencies: (on debian, for example)
 
-Coordinates of the hotspots are only specified for the nominal 24x24 size. The script scales the coordinates to the different sizes and generates the cursors for the different sizes.
+        apt install python3-pil
 
-The `cursorgen.py` script generates the cursors for the different sizes and saves them in the `Adwaita/cursors/` directory.
+1. Clone this repo and cd into `adwaita-icon-theme/src/cursors`.
+
+1. Remove the old pngs rendered: `rm -r pngs`.
+
+1. Run `./renderpngs.py adwaita.svg` to generate the pngs from the svg file.
+
+1. Run `./cursorgen.py` to generate cursor files in the xcursorgen format from the pngs generated in the previous step.
+
+1. Done! Your cursor files are saved to `adwaita-icon-theme/Adwaita`.
+

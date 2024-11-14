@@ -5,12 +5,11 @@ import math
 import subprocess
 import logging
 
-# Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
 
-# Define the nominal size and a dictionary for cursor names and their hotspots (24x24)
-nominal_size = 24
-cursors = {
+# tuples are the hotspot coordinates relative to a 24x24 cursor. math to convert this to other resolutions are done later in the code
+NOMINAL_SIZE = 24
+CURSORS = {
     "alias": (18, 5),
     "all-scroll": (11, 11),
     "cell": (11, 11),
@@ -49,14 +48,12 @@ cursors = {
     "X_cursor": (11, 12)
 }
 
-# Define the sizes we want to scale to
-sizes = [24, 30, 36, 48, 72, 96]
+# sets of cursor resolutions to create
+SIZES = [24, 30, 36, 48, 72, 96]
 
-# Base directories
-png_dir = './pngs'  # Updated to use "pngs"
-output_dir = '../../Adwaita/cursors/'
+PNG_DIR = './pngs'
+OUTPUT_DIR = '../../Adwaita/cursors/'
 
-# Function to generate .in file content
 def generate_in_file_content(cursor_name, cursor_info):
     in_content = []
     is_animated = isinstance(cursor_info, dict)
@@ -65,17 +62,17 @@ def generate_in_file_content(cursor_name, cursor_info):
     hotspot = cursor_info["hotspot"] if is_animated else cursor_info
 
     for frame in frame_range:
-        for size in sizes:
+        for size in SIZES:
             file_name = f"{cursor_name}_{frame:04d}.png" if is_animated else f"{cursor_name}.png"
             png_file_relative = f"pngs/{size}x{size}/{file_name}"
-            png_file = os.path.join(png_dir, f"{size}x{size}", file_name)
+            png_file = os.path.join(PNG_DIR, f"{size}x{size}", file_name)
 
             if not os.path.exists(png_file):
                 logging.error(f"PNG file not found: {png_file}")
                 continue
 
-            hotspot_x = math.floor(hotspot[0] * size / nominal_size)
-            hotspot_y = math.floor(hotspot[1] * size / nominal_size)
+            hotspot_x = math.floor(hotspot[0] * size / NOMINAL_SIZE)
+            hotspot_y = math.floor(hotspot[1] * size / NOMINAL_SIZE)
 
             entry = f"{size} {hotspot_x} {hotspot_y} {png_file_relative}"
             if is_animated:
@@ -84,14 +81,14 @@ def generate_in_file_content(cursor_name, cursor_info):
 
     return ''.join(in_content)
 
-# Function to generate all .in files and call xcursorgen
+# generate all .in files and call xcursorgen
 def generate_cursors():
-    for cursor_name, cursor_info in cursors.items():
+    for cursor_name, cursor_info in CURSORS.items():
         logging.info(f"Processing cursor: {cursor_name}")
 
         # Generate the full .in file content
         in_file_content = generate_in_file_content(cursor_name, cursor_info)
-        in_file_path = os.path.join(png_dir, f'{cursor_name}.in')
+        in_file_path = os.path.join(PNG_DIR, f'{cursor_name}.in')
 
         # Write the .in file in ./pngs/ directory
         try:
@@ -103,20 +100,17 @@ def generate_cursors():
             continue
 
         # Call xcursorgen to generate the cursor file
-        cursor_output = os.path.join(output_dir, cursor_name)
-        command = ['xcursorgen', in_file_path, cursor_output]
+        out_file_path = os.path.join(OUTPUT_DIR, cursor_name)
+        command = ['xcursorgen', in_file_path, out_file_path]
         logging.debug(f"Running command: {' '.join(command)}")
         try:
             subprocess.run(command, check=True)
-            logging.info(f"Generated cursor: {cursor_output}")
+            logging.info(f"Generated cursor: {out_file_path}")
         except subprocess.CalledProcessError as e:
             logging.error(f"xcursorgen failed for {cursor_name}: {str(e)}")
 
 if __name__ == "__main__":
-    # Ensure output directory exists
-    if not os.path.exists(output_dir):
-        logging.info(f"Creating output directory: {output_dir}")
-        os.makedirs(output_dir)
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
 
-    # Call the main function to generate cursors
     generate_cursors()
